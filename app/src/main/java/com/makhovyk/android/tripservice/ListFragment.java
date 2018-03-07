@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.makhovyk.android.tripservice.Model.DBHelper;
@@ -31,7 +32,6 @@ public class ListFragment extends Fragment {
     private String resultMessage;
     private DBHelper dbHelper;
     private List<Trip> trips = new ArrayList<Trip>();
-    private boolean isUIEnabled = true;
 
     private RecyclerView tripsRecyclerView;
 
@@ -39,12 +39,30 @@ public class ListFragment extends Fragment {
     private TextView messageEmpty;
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private Callbacks callbacks;
+
+    public interface Callbacks {
+        void onTripSelected(Trip trip);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callbacks = null;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        callbacks = (Callbacks) context;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
 
         dbHelper = new DBHelper(getActivity());
 
-
+        setRetainInstance(true);
         super.onCreate(savedInstanceState);
 
     }
@@ -137,6 +155,7 @@ public class ListFragment extends Fragment {
         getActivity().registerReceiver(broadcastReceiver,new IntentFilter(TripService.NOTIFICATION));
     }
 
+
     @Override
     public void onPause() {
         super.onPause();
@@ -175,10 +194,9 @@ public class ListFragment extends Fragment {
         @Override
         public void onClick(View view) {
             //show detail info about selected trip
-            if (isUIEnabled) {
-                Intent intent = TripActivity.newIntent(getActivity(), trip);
-                startActivity(intent);
-            }
+                /*Intent intent = TripActivity.newIntent(getActivity(), trip);
+                startActivity(intent);*/
+                callbacks.onTripSelected(trip);
         }
     }
 
@@ -218,15 +236,14 @@ public class ListFragment extends Fragment {
     public void disableUI(){
         progressMessage.setVisibility(View.VISIBLE);
         swipeRefreshLayout.setRefreshing(true);
-        isUIEnabled = false;
+        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
 
     public void enableUI(){
         progressMessage.setVisibility(View.GONE);
         swipeRefreshLayout.setRefreshing(false);
-        isUIEnabled = true;
-
+        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
-
 
 }

@@ -106,13 +106,12 @@ public class TripService extends Service {
                     @Override
                     public void onComplete() {
                         Log.d("Test","Done");
+                        dbHelper.dropTables();
                         if (trips.isEmpty()){
                             message = RESULT_EMPTY;
                             Log.d("Test",message);
                         }else {
                             Log.d("Test", "Writing to the db");
-
-                            dbHelper.dropTables();
 
                             // writing to the db
                             ContentValues cv = new ContentValues();
