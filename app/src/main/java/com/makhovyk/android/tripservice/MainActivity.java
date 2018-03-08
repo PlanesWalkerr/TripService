@@ -27,10 +27,12 @@ public class MainActivity extends AppCompatActivity implements ListFragment.Call
 
     @Override
     public void onTripSelected(Trip trip) {
+        // start single trip activity if small screen layout is used
         if (findViewById(R.id.detail_fragment_container) == null) {
             Intent intent = TripActivity.newIntent(this, trip);
             startActivity(intent);
         } else {
+            // show trip details in container to the right on tablet
             Fragment newDetail = TripFragment.newInstance(trip);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.detail_fragment_container, newDetail)

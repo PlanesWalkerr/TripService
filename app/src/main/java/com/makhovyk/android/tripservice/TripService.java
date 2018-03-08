@@ -140,9 +140,7 @@ public class TripService extends Service {
                                 database.insert(DBHelper.TABLE_TRIPS, null, cv);
                             }
                             Log.d("Test","Successfully saved");
-                            Log.d("Test","Reading");
 
-                         List<Trip> dbTrips = dbHelper.getAllTrips();
 
                         }
                         message = RESULT_OK;

@@ -124,6 +124,7 @@ public class ListFragment extends Fragment {
                                 getActivity().startService(new Intent(getActivity(), TripService.class));
                             }
                         });
+
                         builder.setCancelable(false);
                         AlertDialog dlg = builder.create();
                         dlg.getWindow().setLayout(800,450);
@@ -152,6 +153,7 @@ public class ListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.d("Test", "resume");
         getActivity().registerReceiver(broadcastReceiver,new IntentFilter(TripService.NOTIFICATION));
     }
 
@@ -159,7 +161,27 @@ public class ListFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        Log.d("Test", "pause");
         getActivity().unregisterReceiver(broadcastReceiver);
+    }
+
+
+    public void setItems(List<Trip> trips){
+        tripsRecyclerView.setAdapter(new TripAdapter(trips));
+    }
+
+    //disable UI while performing API request
+    public void disableUI(){
+        progressMessage.setVisibility(View.VISIBLE);
+        swipeRefreshLayout.setRefreshing(true);
+        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+    }
+
+    public void enableUI(){
+        progressMessage.setVisibility(View.GONE);
+        swipeRefreshLayout.setRefreshing(false);
+        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
 
     private class TripHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -196,7 +218,7 @@ public class ListFragment extends Fragment {
             //show detail info about selected trip
                 /*Intent intent = TripActivity.newIntent(getActivity(), trip);
                 startActivity(intent);*/
-                callbacks.onTripSelected(trip);
+            callbacks.onTripSelected(trip);
         }
     }
 
@@ -226,24 +248,6 @@ public class ListFragment extends Fragment {
         public int getItemCount() {
             return trips.size();
         }
-    }
-
-    public void setItems(List<Trip> trips){
-        tripsRecyclerView.setAdapter(new TripAdapter(trips));
-    }
-
-    //disable UI while performing API request
-    public void disableUI(){
-        progressMessage.setVisibility(View.VISIBLE);
-        swipeRefreshLayout.setRefreshing(true);
-        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-    }
-
-    public void enableUI(){
-        progressMessage.setVisibility(View.GONE);
-        swipeRefreshLayout.setRefreshing(false);
-        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
 
 }
